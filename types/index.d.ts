@@ -74,6 +74,8 @@ interface Media {
     stopRecord(): void;
     /** Stops playing an audio file. */
     stop(): void;
+    /** Ask for permission. */
+    askForPermission(): void;
     /**
      * The position within the audio playback, in seconds.
      * Not automatically updated during play; call getCurrentPosition to update.

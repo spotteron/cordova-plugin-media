@@ -782,6 +782,24 @@ BOOL keepAvAudioSessionAlwaysActive = NO;
     }
 }
 
+- (BOOL)askForPermission
+{
+    SEL rrpSel = NSSelectorFromString(@"requestRecordPermission:");
+    if ([self hasAudioSession] && [self.avSession respondsToSelector:rrpSel])
+    {
+        __block BOOL permissionGranted = NO;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        [self.avSession performSelector:rrpSel withObject:^(BOOL granted){
+            permissionGranted = granted;
+        }];
+#pragma clang diagnostic pop
+        return permissionGranted;
+    } else {
+        return YES;
+    }
+}
+
 - (void)stopRecordingAudio:(CDVInvokedUrlCommand*)command
 {
     NSString* mediaId = [command argumentAtIndex:0];

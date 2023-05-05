@@ -71,6 +71,7 @@ public class AudioHandler extends CordovaPlugin {
 
     private String recordId;
     private String fileUriStr;
+    private boolean startRecordingInPermissionCallback;
 
     /**
      * Constructor.
@@ -173,6 +174,11 @@ public class AudioHandler extends CordovaPlugin {
             boolean b = this.release(args.getString(0));
             callbackContext.sendPluginResult(new PluginResult(status, b));
             return true;
+        }
+        else if (action.equals("askForPermission")) {
+            boolean b = this.askForPermission();
+            callbackContext.sendPluginResult(new PluginResult(status, b));
+            return true;   
         }
         else if (action.equals("messageChannel")) {
             messageChannel = callbackContext;
@@ -552,7 +558,7 @@ public class AudioHandler extends CordovaPlugin {
                 return;
             }
         }
-        promptForRecord();
+        this.startRecordingInPermissionCallback?this.promptForRecord():this.askForPermission();
     }
 
     /*
@@ -562,6 +568,7 @@ public class AudioHandler extends CordovaPlugin {
 
     private void promptForRecord()
     {
+        this.startRecordingInPermissionCallback = true;
         if(PermissionHelper.hasPermission(this, permissions[WRITE_EXTERNAL_STORAGE])  &&
                 PermissionHelper.hasPermission(this, permissions[RECORD_AUDIO])) {
             this.startRecordingAudio(recordId, FileHelper.stripFileProtocol(fileUriStr));
@@ -577,6 +584,25 @@ public class AudioHandler extends CordovaPlugin {
 
     }
 
+       
+    private boolean askForPermission()
+    {
+        this.startRecordingInPermissionCallback = false;
+        if(PermissionHelper.hasPermission(this, permissions[WRITE_EXTERNAL_STORAGE])  &&
+                PermissionHelper.hasPermission(this, permissions[RECORD_AUDIO])) {
+            return false;
+        }
+        else if(PermissionHelper.hasPermission(this, permissions[RECORD_AUDIO]))
+        {
+            getWritePermission(WRITE_EXTERNAL_STORAGE);
+        }
+        else
+        {
+            getMicPermission(RECORD_AUDIO);
+        }
+        return true;
+    }
+       
     /**
      * Get current amplitude of recording.
      * @param id				The id of the audio player

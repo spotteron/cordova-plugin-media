@@ -227,6 +227,17 @@ Media.prototype.getCurrentAmplitude = function (success, fail) {
 };
 
 /**
+ * Ask for required permissions, if not granted already 
+ */
+Media.prototype.askForPermission = function () {
+    if (cordova.platformId === 'ios' || cordova.platformId === 'android') {
+        exec(null, null, 'Media', 'askForPermission', []);
+    } else {
+        console.info('media.askForPermission is only supported on Android and iOS.');
+    }
+};
+
+/**
  * Audio has status update.
  * PRIVATE
  *
