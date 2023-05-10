@@ -558,7 +558,11 @@ public class AudioHandler extends CordovaPlugin {
                 return;
             }
         }
-        this.startRecordingInPermissionCallback?this.promptForRecord():this.askForPermission();
+        if (this.startRecordingInPermissionCallback) {
+              this.promptForRecord();
+        } else {
+              this.askForPermission();
+        }
     }
 
     /*
